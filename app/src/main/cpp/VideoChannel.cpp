@@ -64,15 +64,15 @@ void VideoChannel::decodePacket() {
         if(!ret){
             continue;
         }
-        LOGE("pkt_queue get packet susuccess :%d",ret);
+//        LOGE("pkt_queue get packet susuccess :%d",ret);
         //解压frame.
-        LOGE("avcodec_send_packet start !");
+//        LOGE("avcodec_send_packet start !");
 
         if(!avCodecContext){
             LOGE("avCodecContext is NULL!");
         }
         ret = avcodec_send_packet(avCodecContext, packet);
-        LOGE("avcodec_send_packet finished :%d",ret);
+//        LOGE("avcodec_send_packet finished :%d",ret);
 //        releaseAvPacket(packet);//释放packet.
         if(ret == AVERROR(EAGAIN)){
             LOGE("avcodec_send_packet EAGAIN 等待数据包！");

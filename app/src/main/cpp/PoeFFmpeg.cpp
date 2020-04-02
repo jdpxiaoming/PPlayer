@@ -147,10 +147,11 @@ void PoeFFmpeg::start() {
     //播放成功.
     isPlaying = true;
     //开启解码.
-//    if(audioChannel){
-//        audioChannel->play();
-//    }
-
+    //音频解码
+    /*if(audioChannel){
+        audioChannel->play();
+    }*/
+    // 视频解码.
     if(videoChannel){
         //开启视频解码线程. 读取packet-》frame->synchronized->window_buffer.
         videoChannel->play();
@@ -187,9 +188,11 @@ void PoeFFmpeg::play() {
         if(ret == 0){
             //将数据包加入队列.
             if(audioChannel && packet->stream_index == audioChannel->channelId){
+                LOGE("audioChannel->pkt_queue.enQueue(packet):%d", audioChannel->pkt_queue.size());
 //                audioChannel->pkt_queue.enQueue(packet);
             }else if(videoChannel && packet->stream_index == videoChannel->channelId){
                 videoChannel->pkt_queue.enQueue(packet);
+                LOGE("videoChannel->pkt_queue.enQueue(packet):%d", videoChannel->pkt_queue.size());
             }
         }else if(ret == AVERROR_EOF){
             //读取完毕，但是不一定播放完毕

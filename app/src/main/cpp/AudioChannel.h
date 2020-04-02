@@ -14,7 +14,6 @@ class AudioChannel : public BaseChannel {
 
 public:
     AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *codecContext);
-
     /**
      * 播放音频或视频.
      */
@@ -23,6 +22,22 @@ public:
      * 停止播放音频或视频.
      */
     virtual void stop();
+
+    void initOpenSL();
+
+    void decoder();
+
+    int getPcm();
+
+private:
+    pthread_t pid_audio_play;
+    pthread_t pid_audio_decode;
+    SwrContext* swrContext = NULL;
+    int out_channels;
+    int out_samplesize;
+    int out_sample_rate;
+public:
+    uint8_t * buffer;
 };
 
 
