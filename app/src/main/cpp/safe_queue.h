@@ -63,7 +63,7 @@ public:
             q.push(new_value);
             pthread_cond_signal(&cond);
         }else{
-            releaseCallback(new_value);
+//            releaseCallback(new_value);
         }
         pthread_mutex_unlock(&mutex);
 #endif
@@ -134,7 +134,7 @@ public:
         int size = q.size();
         for (int i = 0; i < size; ++i) {
             T value = q.front();
-            releaseCallback(value);
+//            releaseCallback(value);
             q.pop();
         }
         pthread_mutex_unlock(&mutex);
@@ -154,9 +154,9 @@ public:
 
     }
 
-    void setReleaseCallback(ReleaseCallback r) {
+    /*void setReleaseCallback(ReleaseCallback r) {
         releaseCallback = r;
-    }
+    }*/
 
     void setSyncHandle(SyncHandle s) {
         syncHandle = s;
@@ -174,7 +174,7 @@ private:
 
     queue<T> q;
     int work;
-    ReleaseCallback releaseCallback;
+//    ReleaseCallback releaseCallback;
     SyncHandle syncHandle;
 };
 

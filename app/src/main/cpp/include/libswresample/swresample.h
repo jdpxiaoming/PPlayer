@@ -237,7 +237,7 @@ int swr_is_initialized(struct SwrContext *s);
  * @param s               existing Swr context if available, or NULL if not
  * @param out_ch_layout   output channel layout (AV_CH_LAYOUT_*)
  * @param out_sample_fmt  output sample format (AV_SAMPLE_FMT_*).
- * @param out_sample_rate output sample rate (frequency in Hz)
+ * @param + output sample rate (frequency in Hz)
  * @param in_ch_layout    input channel layout (AV_CH_LAYOUT_*)
  * @param in_sample_fmt   input sample format (AV_SAMPLE_FMT_*).
  * @param in_sample_rate  input sample rate (frequency in Hz)

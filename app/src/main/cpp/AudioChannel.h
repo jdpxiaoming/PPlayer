@@ -9,6 +9,7 @@
 #include <android/native_window.h>
 #include <pthread.h>
 #include "JavaCallHelper.h"
+#include <SLES/OpenSLES_Android.h>
 
 class AudioChannel : public BaseChannel {
 
@@ -33,9 +34,9 @@ private:
     pthread_t pid_audio_play;
     pthread_t pid_audio_decode;
     SwrContext* swrContext = NULL;
-    int out_channels;
-    int out_samplesize;
-    int out_sample_rate;
+    int out_channels; //通道数
+    int out_samplesize;//采样率
+    int out_sample_rate;//采样频率.
 public:
     uint8_t * buffer;
 };

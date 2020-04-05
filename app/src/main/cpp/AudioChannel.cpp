@@ -4,24 +4,30 @@
 
 #include "AudioChannel.h"
 
-#include <SLES/OpenSLES_Android.h>
-
 AudioChannel::AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext)
         : BaseChannel(id, javaCallHelper, avCodecContext)
 {
     this->javaCallHelper = javaCallHelper;
     this->avCodecContext = avCodecContext;
+    //初始化音频相关参数
+    out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+    out_samplesize = av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
+    out_sample_rate = 44100;
+    //CD音频标准
+    //44100 双声道 2字节
+    buffer = (uint8_t *)(malloc(out_sample_rate * out_samplesize * out_channels));
 }
 // this callback handler is called every time a buffer finishes playing
-void bqPlayerCallback(SLAndroidSimpleBufferQueueItf caller, void *context)
+void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
 
+    LOGE("bqPlayerCallback()#invoked!");
     AudioChannel* audioChannel = static_cast<AudioChannel *>(context);
     int datalen = audioChannel->getPcm();
     LOGE("bqPlayerCallback()# datalen:%d",datalen);
 
     if(datalen >0 ){
-        (*caller)->Enqueue(caller,audioChannel->buffer,datalen);
+        (*bq)->Enqueue(bq,audioChannel->buffer,datalen);
     }
 }
 
@@ -34,17 +40,17 @@ void* audioPlay(void* args){
 void* audioDecode(void* args){
     AudioChannel* audioChannel = static_cast<AudioChannel *>(args);
     audioChannel->decoder();
-
     return 0;
 }
 
 void AudioChannel::play() {
-//    初始化转换器上下文
+//    初始化转换器上下文,设置重采样 .
     swrContext = swr_alloc_set_opts(0,AV_CH_LAYOUT_STEREO,AV_SAMPLE_FMT_S16,out_sample_rate,
                         avCodecContext->channel_layout,
                         avCodecContext->sample_fmt,
                         avCodecContext->sample_rate,0,0);
-
+    //初始化转换器的其他参数.
+    swr_init(swrContext);
     pkt_queue.setWork(1);
     frame_queue.setWork(1);
     isPlaying = true ;
@@ -75,10 +81,11 @@ void AudioChannel::initOpenSL() {
     SLObjectItf outputMixObject = NULL;
     //3. 创建播放器
     SLObjectItf  bqPlayerObject = NULL;
+    // 回调接口.
     SLPlayItf  bqPlayerInterface = NULL;
     //4. 创建缓冲队列和回调函数
-    SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue = NULL;
-
+//    SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue = NULL;
+    SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue ;
     //创建音频引擎 .
 
     // ----------------------------1. 初始化播放器引擎-----------------------------------------------
@@ -92,28 +99,27 @@ void AudioChannel::initOpenSL() {
         return ;
     }
     //获取音频接口，相当于surfaceHolder对于surfaceView的控制一样.
-    // get the engine interface, which is needed in order to create other objects
     result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineInterface);
     if(SL_RESULT_SUCCESS != result){
         return ;
     }
 
-
     // ---------------------------2. 初始化混音器----------------------------------------------------
-    // create output mix, with environmental reverb specified as a non-required interface
-    result = (*engineInterface)->CreateOutputMix(engineInterface, &outputMixObject, 0, 0, 0);
+    //创建混音器.
+    const SLInterfaceID ids[1] = {SL_IID_ENVIRONMENTALREVERB};
+    const SLboolean req[1] = {SL_BOOLEAN_FALSE};
+    result = (*engineInterface)->CreateOutputMix(engineInterface, &outputMixObject, 1, ids, req);
     //初始化混音器.
-    // realize the output mix
     result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
     if(SL_RESULT_SUCCESS != result){
         return ;
     }
 
     //5. 设置播放状态
-    //创建播放器.双声道最后写2.
+    //创建播放器.双声道最后写2. configure audio source
     SLDataLocator_AndroidSimpleBufferQueue android_queue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,2};
 
-    SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM,//播放pcm格式数据.
+    SLDataFormat_PCM pcm = {SL_DATAFORMAT_PCM,//播放pcm格式数据.
                                    2,                //2个声道(立体声).
                                    SL_SAMPLINGRATE_44_1,//44100hz的频率.
                                    SL_PCMSAMPLEFORMAT_FIXED_16,//位数16bit
@@ -122,7 +128,7 @@ void AudioChannel::initOpenSL() {
                                    SL_BYTEORDER_LITTLEENDIAN//小端模式.
     };
 
-    SLDataSource slDataSource = {&android_queue, &format_pcm};
+    SLDataSource audioSrc = {&android_queue, &pcm};
 
     // configure audio sink
     SLDataLocator_OutputMix outputMix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
@@ -132,42 +138,64 @@ void AudioChannel::initOpenSL() {
         *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
         *     for fast audio case
         */
-    const SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE/*, SL_IID_VOLUME, SL_IID_EFFECTSEND,
+    const SLInterfaceID ids2[1] = {SL_IID_BUFFERQUEUE/*, SL_IID_VOLUME, SL_IID_EFFECTSEND,
             SL_IID_MUTESOLO,*/};
-    const SLboolean req[1] = {SL_BOOLEAN_TRUE/*, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+    const SLboolean req2[1] = {SL_BOOLEAN_TRUE/*, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
             SL_BOOLEAN_TRUE,*/ };
     (*engineInterface)->CreateAudioPlayer(engineInterface
                                     ,&bqPlayerObject //播放器
-                                    ,&slDataSource//播放器参数 播放器缓冲队列 播放格式
+                                    ,&audioSrc//播放器参数 播放器缓冲队列 播放格式
                                     ,&audioSnk // 播放缓冲区
                                     ,1//播放接口回调个数.
-                                    ,ids //设置播放队列ID
-                                    ,req //是否采用内置的播放队列
+                                    ,ids2 //设置播放队列ID
+                                    ,req2 //是否采用内置的播放队列
                                     );
     //初始化播放器.
-    (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
-
+    // realize the player
+    result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
+    if(SL_RESULT_SUCCESS != result){
+        return ;
+    }
+    LOGE("realize the player success!");
+    //获取播放器接口player interface.
     // get the play interface
-    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerInterface);
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_PLAY, &bqPlayerInterface);
 
+    //获取pcm缓冲队列.
     // get the buffer queue interface
-    (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE,&bqPlayerBufferQueue);
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE, &bqPlayerBufferQueue);
     //注册回调函数.
+    if(SL_RESULT_SUCCESS != result){
+        return ;
+    }
+    LOGE("get the buffer queue interface success!");
+
     // register callback on the buffer queue
-    (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback ,this);
+    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, bqPlayerCallback, this);
+    if(SL_RESULT_SUCCESS != result){
+        return ;
+    }
+    LOGE("RegisterCallback success!");
     //设置播放状态.
-    (*bqPlayerInterface)->SetPlayState(bqPlayerInterface,SL_PLAYSTATE_PLAYING);
+    result = (*bqPlayerInterface)->SetPlayState(bqPlayerInterface, SL_PLAYSTATE_PLAYING);
+    if(SL_RESULT_SUCCESS != result){
+        return ;
+    }
+
+    LOGE("SetPlayState SL_PLAYSTATE_PLAYING success!");
     //6. 启动回调函数.
-    bqPlayerCallback(bqPlayerBufferQueue , this);
     LOGE("手动调用播放器 packet:%d",this->pkt_queue.size());
+    bqPlayerCallback(bqPlayerBufferQueue , this);
 }
 
 void AudioChannel::decoder() {
-    LOGE("AudioChannel::decoder()  !");
+    LOGE("AudioChannel::decoder()  ! isPlaying: %d",isPlaying);
     AVPacket* packet = 0;
     while (isPlaying){
         //音频的pakcket.
+        LOGE("AudioChannel::decoder() #dequeue start !");
          int ret = pkt_queue.deQueue(packet);
+        LOGE("AudioChannel::decoder() #dequeue success# !%s",packet);
          if(!isPlaying){
              break;
          }
@@ -178,6 +206,7 @@ void AudioChannel::decoder() {
         LOGE("avcodec_send_packet start ! codecContext:%s",avCodecContext);
          //packet送去解码
          ret = avcodec_send_packet(avCodecContext, packet);
+
          releaseAvPacket(packet);
         if(ret == AVERROR(EAGAIN)){
             LOGE("avcodec_send_packet EAGAIN 等待数据包！");
@@ -191,6 +220,8 @@ void AudioChannel::decoder() {
 
         AVFrame* avFrame = av_frame_alloc();
         ret = avcodec_receive_frame(avCodecContext , avFrame);
+        LOGE("avcodec_receive_frame success ! avFrame:%s",avFrame);
+
         if(ret == AVERROR(EAGAIN)){
             //需要更多数据
             continue;
@@ -200,11 +231,13 @@ void AudioChannel::decoder() {
             break;
         }
         //packet -》fram.
+        frame_queue.enQueue(avFrame);
+        LOGE("frame_queue enQueue success ! :%d",frame_queue.size());
         while (frame_queue.size() > 100 && isPlaying){
-            av_usleep(1*1000);
+            LOGE("frame_queue %d is full, sleep 16 ms",frame_queue.size());
+            av_usleep(16*1000);
             continue;
         }
-        frame_queue.enQueue(avFrame);
     }
     releaseAvPacket(packet);
 }
@@ -220,7 +253,6 @@ int AudioChannel::getPcm() {
     while (isPlaying){
         int ret = frame_queue.deQueue(frame);
         //转换.
-
         if(!isPlaying){
             break;
         }
@@ -243,7 +275,6 @@ int AudioChannel::getPcm() {
 
         //计算转换后buffer的大小 44100*2（采样位数2个字节）*2（双通道）.  。
         data_size = nb * out_channels*out_samplesize;
-
         break;
     }
 
