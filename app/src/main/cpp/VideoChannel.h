@@ -14,7 +14,7 @@
 typedef void (*RenderFrame) (uint8_t* ,int ,int,int);
 class VideoChannel :public BaseChannel{
 public:
-    VideoChannel(int id, JavaCallHelper *javaCallHelper1,AVCodecContext *codecContext);
+    VideoChannel(int id, JavaCallHelper *javaCallHelper1,AVCodecContext *codecContext,AVRational time_base);
 
     /**
      * 播放音频或视频.
@@ -36,10 +36,15 @@ public:
     void synchronizeFrame();
 
     void setReanderFrame(RenderFrame renderFrame);
+    void setFps(int fps);
 private:
     pthread_t  pid_video_play;
     pthread_t  pid_synchronize;
     RenderFrame renderFrame;
+    int fps;
+public:
+    AudioChannel* audioChannel; //音视频同步使用 .
+    double  clock;// 音视频同步使用.
 };
 
 

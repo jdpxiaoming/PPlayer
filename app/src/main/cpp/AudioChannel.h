@@ -14,7 +14,7 @@
 class AudioChannel : public BaseChannel {
 
 public:
-    AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *codecContext);
+    AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *codecContext,AVRational time_base);
     /**
      * 播放音频或视频.
      */
@@ -39,6 +39,7 @@ private:
     int out_sample_rate;//采样频率.
 public:
     uint8_t * buffer;
+    double  clock;// 音视频同步使用.
 };
 
 

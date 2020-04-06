@@ -35,7 +35,10 @@ extern "C"{
 class BaseChannel {
 public:
     BaseChannel(int id, JavaCallHelper* javaCallHelper,
-            AVCodecContext* codecContext):channelId(id),javaCallHelper(javaCallHelper),avCodecContext(codecContext)
+            AVCodecContext* codecContext,AVRational time_base):channelId(id),
+            javaCallHelper(javaCallHelper),
+            avCodecContext(codecContext),
+            time_base(time_base)
     {
 
     }
@@ -83,6 +86,7 @@ public:
     volatile bool isPlaying;
     AVCodecContext* avCodecContext;
     JavaCallHelper* javaCallHelper;
+    AVRational time_base;
 };
 
 

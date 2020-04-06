@@ -4,8 +4,8 @@
 
 #include "AudioChannel.h"
 
-AudioChannel::AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext)
-        : BaseChannel(id, javaCallHelper, avCodecContext)
+AudioChannel::AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,AVRational time_base)
+        : BaseChannel(id, javaCallHelper, avCodecContext,time_base)
 {
     this->javaCallHelper = javaCallHelper;
     this->avCodecContext = avCodecContext;
@@ -275,6 +275,10 @@ int AudioChannel::getPcm() {
 
         //计算转换后buffer的大小 44100*2（采样位数2个字节）*2（双通道）.  。
         data_size = nb * out_channels*out_samplesize;
+
+        //计算当前音频的播放时钟clock. pts相对数量 time_base:时间单位（1,25）表示1/25分之一秒.
+        clock = frame->pts*av_q2d(time_base);
+
         break;
     }
 

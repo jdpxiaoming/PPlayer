@@ -5,12 +5,54 @@
 
 #include "VideoChannel.h"
 
-VideoChannel::VideoChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext)
-        : BaseChannel(id, javaCallHelper, avCodecContext)
+
+
+/**
+ * 丢AVPacket ，丢非I帧.
+ * @param q
+ */
+void dropPacket(queue<AVPacket *> &q){
+    LOGE("丢弃视频Packet.....");
+
+    while (!q.empty()){
+
+        AVPacket* pkt = q.front();
+        if(pkt->flags != AV_PKT_FLAG_KEY){
+            q.pop();
+            BaseChannel::releaseAvPacket(pkt);
+        }else{
+            break;
+        }
+    }
+}
+
+/**
+ * 丢掉frame帧. 清空frame队列.
+ * @param q
+ */
+void dropFrame(queue<AVFrame *> &q){
+    LOGE("丢弃视频Frame.....");
+    while (!q.empty()){
+        AVFrame* frame = q.front();
+        q.pop();
+        BaseChannel::releaseAvFrame(frame);
+    }
+}
+
+VideoChannel::VideoChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,AVRational time_base)
+        : BaseChannel(id, javaCallHelper, avCodecContext,time_base)
         {
             this->javaCallHelper = javaCallHelper;
             this->avCodecContext = avCodecContext;
+            pkt_queue.setReleaseCallback(releaseAvPacket);
+            pkt_queue.setSyncHandle(dropPacket);
+            frame_queue.setReleaseCallback(releaseAvFrame);
+            frame_queue.setSyncHandle(dropFrame);
+
         }
+
+
+
 /**
  * 解码线程.
  * @param args
@@ -136,11 +178,56 @@ void VideoChannel::synchronizeFrame() {
 
         sws_scale(swsContext , frame->data, frame->linesize ,0,frame->height,
                   dst_data, dst_linesize);
+
+        frame->pts;
         //已经获取了rgb数据，则回调给native-lib层使用.
         renderFrame (dst_data[0],dst_linesize[0] , avCodecContext->width,avCodecContext->height);
         //暂时没有来做到音视频同步，所以渲染一帧，等待16ms.
-        av_usleep(1000*16);
         LOGE("解码一帧视频  %d",frame_queue.size());
+
+        clock = frame->pts*av_q2d(time_base);
+        //解码一帧视频延时时间.
+        double frame_delay = 1.0/fps;
+        //解码一帧花费的时间. 配置差的手机 解码耗时教旧，所以需要考虑解码时间.
+        double extra_delay = frame->repeat_pict/(2*fps);
+        double delay = frame_delay + extra_delay;
+
+
+        double audioClock = audioChannel->clock;
+        double diff = clock - audioClock;
+
+        LOGE(" audio clock %d",audioClock);
+        LOGE(" video clock %d",clock);
+        LOGE(" fps %d",fps);
+        LOGE(" frame_delay %d",frame_delay);
+        LOGE(" extra_delay %d",extra_delay);
+
+
+        LOGE("-----------相差----------  %d ",diff);
+        if(clock > audioClock){//视频超前，睡一会.
+            LOGE("-----------视频超前，相差----------  %d",diff);
+            if(diff>1){
+                LOGE("-----------睡眠long----------  %d",(delay*2));
+                //差的太久了，那只能慢慢赶 不然卡好久
+                av_usleep((delay*2)*1000000);
+            }else{
+                LOGE("-----------睡眠normal----------  %d",(delay+diff));
+                av_usleep((delay+diff)*1000000);
+            }
+
+        }else{//音频超前，需要丢帧进行处理 .
+            LOGE("-----------音频超前，相差----------  %d",diff);
+            if(abs(diff)>1){
+                //不休眠.
+            }else if(abs(diff) > 0.05){
+                //视频需要追赶.丢帧(非关键帧) 同步
+                releaseAvFrame(frame);
+                frame_queue.sync();
+            }else{
+                av_usleep((delay+diff)*1000000);
+            }
+        }
+
         //释放不需要的frame,frame已经没有利用价值了.
         releaseAvFrame(frame);
     }
@@ -154,4 +241,8 @@ void VideoChannel::synchronizeFrame() {
 
 void VideoChannel::setReanderFrame(RenderFrame renderFrame) {
     this->renderFrame = renderFrame;
+}
+
+void VideoChannel::setFps(int fps) {
+    this->fps = fps;
 }

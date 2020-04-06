@@ -73,6 +73,8 @@ void PoeFFmpeg::prepareFFmpeg() {
 
     for(int i =0; i< formatContext->nb_streams;i++){
 
+        AVStream* stream = formatContext->streams[i];
+
         //3.1 找解码参数
         AVCodecParameters* codecParameters = formatContext->streams[i]->codecpar;
         //3.2 找解码器
@@ -112,22 +114,31 @@ void PoeFFmpeg::prepareFFmpeg() {
         //音频
         if(AVMEDIA_TYPE_AUDIO == codecParameters->codec_type){
             //音频
-            audioChannel = new AudioChannel(i,javaCallHelper ,codecContext);
+            audioChannel = new AudioChannel(i,javaCallHelper ,codecContext,stream->time_base);
         } else if(AVMEDIA_TYPE_VIDEO == codecParameters->codec_type){
-            //视频
-            videoChannel = new VideoChannel(i, javaCallHelper,codecContext);
-            videoChannel->setReanderFrame(renderFrame);
-        }
+            //视频的帧率.
+            AVRational av_frame_rate = stream->avg_frame_rate;
 
-        //音视频都没有则抛出错误。没有满足规则的流.
-        if(!audioChannel && !videoChannel){
-            if(javaCallHelper){
-                javaCallHelper->onError(THREAD_CHILD ,FFMPEG_NO_MEDIA);
-            }
-            return;
+            int fps = av_q2d(av_frame_rate);
+
+            //视频
+            videoChannel = new VideoChannel(i, javaCallHelper,codecContext,stream->time_base);
+            videoChannel->setReanderFrame(renderFrame);
+            videoChannel->setFps(fps);
+
         }
     }
 
+    //音视频都没有则抛出错误。没有满足规则的流.
+    if(!audioChannel && !videoChannel){
+        if(javaCallHelper){
+            javaCallHelper->onError(THREAD_CHILD ,FFMPEG_NO_MEDIA);
+        }
+        return;
+    }
+
+    //获取音频对象，音视频同步用.
+    videoChannel->audioChannel = audioChannel;
     //回调，准备工作完成
     if(javaCallHelper){
         javaCallHelper->onPrepare(THREAD_CHILD);
