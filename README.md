@@ -34,7 +34,7 @@ mPlayer.setDataSource("rtmp://xxxxxxx.com/abcd12343");
 ```
 
 # 测试流地址 
-1. 推荐[red5百度网盘](链接：https://pan.baidu.com/s/1IEbbWcg5633GkL0V5MTupw) 提取码：`veyq`
+1. 推荐[red5百度网盘](https://pan.baidu.com/s/1IEbbWcg5633GkL0V5MTupw) 提取码：`veyq`
 2. `nginx+lib-rtmp`服务器搭配`FFmpeg`或者`Obs`推流
 
 # License
