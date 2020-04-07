@@ -39,6 +39,7 @@ void PoeFFmpeg::prepare() {
  */
 void PoeFFmpeg::prepareFFmpeg() {
 
+    av_register_all();
     //avformat 既可以解码本地文件 也可以解码直播文件，是一样的 .
     avformat_network_init();
     //总上下文，用来解压视频为 视频流+音频流.
@@ -48,11 +49,13 @@ void PoeFFmpeg::prepareFFmpeg() {
     AVDictionary* opts = NULL;
     //设置超时时间3s（3000ms->3000000mms)
     av_dict_set(&opts , "timeout" , "3000000",0);
+    char buf[1024];
     //开始打开视频文件 .
-    int ret = avformat_open_input(&formatContext , url , NULL, &opts);
-
+    int ret = avformat_open_input(&formatContext , url , NULL, NULL);
+    av_strerror(ret, buf, 1024);
     if(ret != 0 ){
-        LOGD("* * * * * * video open failure! * * * * * * * * *n");
+        LOGD("* * * * * * video open failure! * * * * * * * * *n %d",ret);
+        LOGE("Couldn’t open file %s: %d(%s)", url, ret, buf);
         //播放失败，通知java层播放失败了.
         if(javaCallHelper){
             javaCallHelper->onError(THREAD_CHILD ,FFMPEG_CAN_NOT_OPEN_URL);
@@ -63,7 +66,7 @@ void PoeFFmpeg::prepareFFmpeg() {
 //解析视频流 .放到frormatcontex里头.
     ret = avformat_find_stream_info(formatContext,NULL);
     if(ret < 0 ){
-        LOGD("* * * * * * video find stream failure! * * * * * * * * *n");
+        LOGD("* * * * * * video find stream failure! * * * * * * * * * %d",ret);
         //播放失败，通知java层播放失败了.
         if(javaCallHelper){
             javaCallHelper->onError(THREAD_CHILD ,FFMPEG_CAN_NOT_FIND_STREAMS);

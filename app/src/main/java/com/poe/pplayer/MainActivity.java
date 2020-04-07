@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private PoePlayer mPlayer;
-    private String mUrl = "rtmp://192.168.1.3:1935/oflaDemo/guardians2.mp4";
+    private String mUrl = "rtmp://192.168.1.3:1935/oflaDemo/BladeRunner2049.flv";
     /**
      * 播放本地视频文件 /poe/input.mp4n   3205837018613102
      */
@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mPlayer.setDataSource(input.getAbsolutePath());
+//        mPlayer.setDataSource(mUrl);
         mPlayer.setOnPrepareListener(new PoePlayer.OnPrepareListener() {
             @Override
             public void onPrepare() {
