@@ -24,6 +24,7 @@ PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器
  
 
 # 运行demo
+1. 去release中下载源代码，然后看下面静态库地址可以考虑百度网盘
 1. 直接使用AndroidStudio导入本项目运行app
 2. 拷贝`capture/input.mp4`到`/data/com.poe.pplayer/cache`
 3. 点击"播放"
@@ -36,6 +37,10 @@ mPlayer.setDataSource("rtmp://xxxxxxx.com/abcd12343");
 # 测试流地址 
 1. 推荐[red5百度网盘](https://pan.baidu.com/s/1IEbbWcg5633GkL0V5MTupw) 提取码：`veyq`
 2. `nginx+lib-rtmp`服务器搭配`FFmpeg`或者`Obs`推流
+
+
+# 静态库由于体积太大，我放到了百度网盘，
+[FFmpeg4.0.2静态库（32/64bit)](https://pan.baidu.com/s/1Jh6HpRssMZTz2OH8j1GrGg) 提取码：`2c16`
 
 # License
     Copyright 2020 Poe.Cai.
