@@ -10,7 +10,7 @@ PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器
 
 ![pic](https://github.com/jdpxiaoming/PPlayer/blob/master/capture/output2.gif)
 
-# 如果有32位播放需求，欢迎给我提`issue`，有时间会把编译ffmpeg的教程也放上来。
+# 欢迎给我提`issue`，有想法也可以提. 
 
 # ToDoList
 - [x] 视频解码
