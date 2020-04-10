@@ -40,7 +40,7 @@ PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器
 ```
 mPlayer.setDataSource("rtmp://xxxxxxx.com/abcd12343");
 ```
-
+![pic](https://github.com/jdpxiaoming/PPlayer/blob/master/capture/hometiny.gif)
 
 # 测试流地址 
 1. 推荐[red5百度网盘](https://pan.baidu.com/s/1IEbbWcg5633GkL0V5MTupw) 提取码：`veyq`
