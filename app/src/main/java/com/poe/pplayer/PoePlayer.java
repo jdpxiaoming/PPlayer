@@ -78,14 +78,21 @@ public class PoePlayer implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        native_pause();
     }
 
+
+
+    public void close(){
+        native_close();
+    }
 
 
     private native void native_prepare(String url);
     private native void native_set_surface(Surface surface);
     private native void native_start();
+    private native void native_pause();
+    private native void native_close();
 
 
     /***回调方法***/

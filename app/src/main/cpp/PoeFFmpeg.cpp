@@ -222,12 +222,38 @@ void PoeFFmpeg::play() {
     }
 
     isPlaying = false;
-    audioChannel->stop();
-    videoChannel->stop();
+
+    if(audioChannel){
+        audioChannel->stop();
+    }
+    if(videoChannel){
+        videoChannel->stop();
+    }
 }
 
 void PoeFFmpeg::setRenderCallBack(RenderFrame renderFrame) {
     this->renderFrame = renderFrame;
+}
+
+void PoeFFmpeg::pause() {
+    //先关闭播放状态.
+//    isPlaying = false;
+}
+
+void PoeFFmpeg::close() {
+    //先关闭播放状态.
+    isPlaying = false;
+    //1. 停止prepare线程.
+    pthread_join(pid_prepare,NULL);
+    //2. 停止play线程
+    pthread_join(pid_play,NULL);
+
+    /*if(audioChannel){
+        audioChannel->stop();
+    }
+    if(videoChannel){
+        videoChannel->stop();
+    }*/
 }
 
 

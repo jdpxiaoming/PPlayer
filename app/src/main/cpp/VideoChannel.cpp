@@ -91,7 +91,15 @@ void VideoChannel::play() {
 }
 
 void VideoChannel::stop() {
-
+    //1. set the playing flag false.
+    isPlaying = false;
+    //2. release thread deque packet thread .
+    pthread_join(pid_video_play,NULL);
+    //3. release the synchronize thread for frame transform and render .
+    pthread_join(pid_synchronize,NULL);
+    //4. clear the queue .
+    pkt_queue.clear();
+    frame_queue.clear();
 }
 
 /**

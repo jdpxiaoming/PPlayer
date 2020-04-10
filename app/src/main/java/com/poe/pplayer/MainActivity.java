@@ -13,6 +13,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -28,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
     private SurfaceView mSurfaceView;
     private SeekBar mSeekBar;
     private int mPorgress;
+    private EditText mUrlEtv;
+
+    private PoePlayer mPlayer;
+    private String mUrl = "rtmp://192.168.1.3:1935/oflaDemo/BladeRunner2049.flv";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
         mSurfaceView = findViewById(R.id.surface_view);
         Button play = findViewById(R.id.btn_play);
         mSeekBar = findViewById(R.id.seek_bar);
-
+        mUrlEtv = findViewById(R.id.edt_url);
+        mUrlEtv.setText(mUrl);
         //监听进度变化.
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -85,8 +91,7 @@ public class MainActivity extends AppCompatActivity {
         }*/
     }
 
-    private PoePlayer mPlayer;
-    private String mUrl = "rtmp://192.168.1.3:1935/oflaDemo/BladeRunner2049.flv";
+
     /**
      * 播放本地视频文件 /poe/input.mp4n   3205837018613102
      */
@@ -100,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
             Log.e("poe","input 不存存在！");
         }
 
-        mPlayer.setDataSource(input.getAbsolutePath());
-//        mPlayer.setDataSource(mUrl);
+//        mPlayer.setDataSource(input.getAbsolutePath());
+        mPlayer.setDataSource(mUrlEtv.getText().toString());
         mPlayer.setOnPrepareListener(new PoePlayer.OnPrepareListener() {
             @Override
             public void onPrepare() {
@@ -112,4 +117,12 @@ public class MainActivity extends AppCompatActivity {
         mPlayer.prepare();
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(null != mPlayer){
+            mPlayer.close();
+        }
+    }
 }

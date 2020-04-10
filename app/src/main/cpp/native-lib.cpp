@@ -110,4 +110,24 @@ Java_com_poe_pplayer_PoePlayer_native_1set_1surface(JNIEnv *env, jobject thiz, j
     }
     //创建AWindow.
     window = ANativeWindow_fromSurface(env, surface);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_poe_pplayer_PoePlayer_native_1pause(JNIEnv *env, jobject thiz) {
+    // TODO: implement native_pause()
+    if(poeFFmpeg){
+        poeFFmpeg->pause();
+    }
+}
+
+//关闭解码线程，释放资源.
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_poe_pplayer_PoePlayer_native_1close(JNIEnv *env, jobject thiz) {
+    // TODO: implement native_close()
+    //1. 停止video解码
+    if(poeFFmpeg){
+        poeFFmpeg->close();
+    }
+
+    //2 .停止audio解码.
 }

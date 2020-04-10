@@ -43,6 +43,8 @@ public:
     void prepareFFmpeg();
     void start();
     void play();
+    void pause();
+    void close();
     void setRenderCallBack(RenderFrame renderFrame);
 public:
     bool isPlaying;

@@ -16,6 +16,9 @@ AudioChannel::AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContex
     //CD音频标准
     //44100 双声道 2字节
     buffer = (uint8_t *)(malloc(out_sample_rate * out_samplesize * out_channels));
+    //设置清空回调函数释放对象的回调.
+    pkt_queue.setReleaseCallback(releaseAvPacket);
+    frame_queue.setReleaseCallback(releaseAvFrame);
 }
 // this callback handler is called every time a buffer finishes playing
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
@@ -63,10 +66,16 @@ void AudioChannel::play() {
 }
 
 void AudioChannel::stop() {
-
+    //1. set the playing flag false.
+    isPlaying = false;
+    //2. release thread deque packet thread .
+    pthread_join(pid_audio_decode,NULL);
+    //3. release the synchronize thread for frame transform and render .
+    pthread_join(pid_audio_play,NULL);
+    //4. clear the queue .
+    pkt_queue.clear();
+    frame_queue.clear();
 }
-
-
 
 /**
  * 初始化音频解码.

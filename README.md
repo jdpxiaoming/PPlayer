@@ -17,7 +17,7 @@ PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器
 - [x] 音频解码
 - [x] 音视频同步
 - [x] 播放在线流媒体RTMP、RTSP、HLS
-- [ ] 线程释放
+- [x] 线程释放
 - [ ] `seek`进度条拖动
 - [ ] `libx264`推流`H264`
 - [ ] `faac`推流`AAC` 
@@ -37,7 +37,7 @@ mPlayer.setDataSource("rtmp://xxxxxxx.com/abcd12343");
 # 测试流地址 
 1. 推荐[red5百度网盘](https://pan.baidu.com/s/1IEbbWcg5633GkL0V5MTupw) 提取码：`veyq`
 2. `nginx+lib-rtmp`服务器搭配`FFmpeg`或者`Obs`推流
-
+![pic](https://github.com/jdpxiaoming/PPlayer/blob/master/capture/hometiny.gif)
 
 # 静态库由于体积太大，我放到了百度网盘，
 [FFmpeg4.0.2静态库（32/64bit)](https://pan.baidu.com/s/1Jh6HpRssMZTz2OH8j1GrGg) 提取码：`2c16`
