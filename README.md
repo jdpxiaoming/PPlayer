@@ -45,7 +45,7 @@ mPlayer.setDataSource("rtmp://xxxxxxx.com/abcd12343");
 # 测试流地址 
 1. 推荐[red5百度网盘](https://pan.baidu.com/s/1IEbbWcg5633GkL0V5MTupw) 提取码：`veyq`
 2. `nginx+lib-rtmp`服务器搭配`FFmpeg`或者`Obs`推流
-![pic](https://github.com/jdpxiaoming/PPlayer/blob/master/capture/hometiny.gif)
+![pic](https://github.com/jdpxiaoming/PPlayer/blob/master/capture/hometiny.png)
 
 # 静态库由于体积太大，我放到了百度网盘，
 [FFmpeg4.0.2静态库（32/64bit)](https://pan.baidu.com/s/1Jh6HpRssMZTz2OH8j1GrGg) 提取码：`2c16`
