@@ -1,4 +1,4 @@
-PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器
+PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器(Player Base on FFmpeg ,support RTMP/RTSP/HLS/H265)
 ===
 >ffmpeg 4.0.2静态库从0开始一个播放器的搭建，支持rtmp、rtsp、hls、本地MP4文件播放，视频解码+音频解码+音视频同步
 
@@ -21,8 +21,8 @@ PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器
 - [x] 音视频同步
 - [x] 播放在线流媒体RTMP、RTSP、HLS
 - [x] 线程释放
-- [ ] `seek`进度条拖动
-- [ ] `libx264`推流`H264`
+- [ ] `seek`进度条拖动(av_seek_frame)
+- [ ] `x264`推流`H264`
 - [ ] `faac`推流`AAC` 
  
 
