@@ -39,11 +39,12 @@ void dropFrame(queue<AVFrame *> &q){
     }
 }
 
-VideoChannel::VideoChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,AVRational time_base)
+VideoChannel::VideoChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,AVRational time_base,AVFormatContext* formatContext)
         : BaseChannel(id, javaCallHelper, avCodecContext,time_base)
         {
             this->javaCallHelper = javaCallHelper;
             this->avCodecContext = avCodecContext;
+            this->avFormatContext = formatContext;
             pkt_queue.setReleaseCallback(releaseAvPacket);
             pkt_queue.setSyncHandle(dropPacket);
             frame_queue.setReleaseCallback(releaseAvFrame);
@@ -253,4 +254,9 @@ void VideoChannel::setReanderFrame(RenderFrame renderFrame) {
 
 void VideoChannel::setFps(int fps) {
     this->fps = fps;
+}
+
+
+void VideoChannel::seek(long ms) {
+    LOGE("VideoChannel::seek has not implemeted!");
 }

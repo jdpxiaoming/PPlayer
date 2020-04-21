@@ -130,4 +130,11 @@ Java_com_poe_pplayer_PoePlayer_native_1close(JNIEnv *env, jobject thiz) {
     }
 
     //2 .停止audio解码.
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_poe_pplayer_PoePlayer_native_1seek(JNIEnv *env, jobject thiz, jlong ms) {
+    // TODO: implement native_seek()
+    if(poeFFmpeg){
+        poeFFmpeg->seek(ms);
+    }
 }

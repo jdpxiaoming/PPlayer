@@ -4,11 +4,12 @@
 
 #include "AudioChannel.h"
 
-AudioChannel::AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,AVRational time_base)
+AudioChannel::AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *avCodecContext,AVRational time_base, AVFormatContext* formatContext)
         : BaseChannel(id, javaCallHelper, avCodecContext,time_base)
 {
     this->javaCallHelper = javaCallHelper;
     this->avCodecContext = avCodecContext;
+    this->avFormatContext = formatContext;
     //初始化音频相关参数
     out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
     out_samplesize = av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
@@ -293,4 +294,19 @@ int AudioChannel::getPcm() {
 
     releaseAvFrame(frame);
     return data_size;
+}
+
+
+//seek frame ..
+void AudioChannel::seek(long ms){
+    if(ms > 0){
+        int64_t timestamp;
+        timestamp += ms;
+       int ret =  avformat_seek_file(avFormatContext,channelId,INT64_MIN, timestamp , INT64_MAX, AVSEEK_FLAG_BACKWARD);
+
+        if (ret < 0) {
+            LOGE("could not seek to position %0.3f\n",(double)timestamp / AV_TIME_BASE);
+        }
+
+    }
 }

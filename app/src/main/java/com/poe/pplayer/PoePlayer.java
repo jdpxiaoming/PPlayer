@@ -46,6 +46,14 @@ public class PoePlayer implements SurfaceHolder.Callback {
     }
 
     /**
+     * mp4文件seek .
+     * @param milliseconds
+     */
+    public void seek(long milliseconds){
+        native_seek(milliseconds);
+    }
+
+    /**
      * 开始播放之前调用{@link #prepare}
      */
     public void start(){
@@ -91,6 +99,7 @@ public class PoePlayer implements SurfaceHolder.Callback {
     private native void native_prepare(String url);
     private native void native_set_surface(Surface surface);
     private native void native_start();
+    private native void native_seek(long ms);//seek毫秒.
     private native void native_pause();
     private native void native_close();
 

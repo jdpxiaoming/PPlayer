@@ -46,6 +46,7 @@ public:
     void pause();
     void close();
     void setRenderCallBack(RenderFrame renderFrame);
+    void seek(long ms);
 public:
     bool isPlaying;
     pthread_t pid_prepare;//准备完成后销毁.

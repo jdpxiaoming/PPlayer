@@ -14,7 +14,7 @@
 class AudioChannel : public BaseChannel {
 
 public:
-    AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *codecContext,AVRational time_base);
+    AudioChannel(int id, JavaCallHelper *javaCallHelper, AVCodecContext *codecContext,AVRational time_base,AVFormatContext* formatContext);
     /**
      * 播放音频或视频.
      */
@@ -24,11 +24,15 @@ public:
      */
     virtual void stop();
 
+    virtual void seek(long ms);
+
     void initOpenSL();
 
     void decoder();
 
     int getPcm();
+
+
 
 private:
     pthread_t pid_audio_play;

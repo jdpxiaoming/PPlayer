@@ -79,12 +79,19 @@ public:
      */
     virtual void stop()=0;
 
+    /**
+     * seek video.
+     * @param ms
+     */
+    virtual void seek(long ms)=0;
+
 public:
     SafeQueue<AVPacket *> pkt_queue;
     SafeQueue<AVFrame *> frame_queue;
     volatile int channelId;
     volatile bool isPlaying;
     AVCodecContext* avCodecContext;
+    AVFormatContext* avFormatContext;
     JavaCallHelper* javaCallHelper;
     AVRational time_base;
 };

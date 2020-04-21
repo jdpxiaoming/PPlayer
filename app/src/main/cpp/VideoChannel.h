@@ -14,7 +14,7 @@
 typedef void (*RenderFrame) (uint8_t* ,int ,int,int);
 class VideoChannel :public BaseChannel{
 public:
-    VideoChannel(int id, JavaCallHelper *javaCallHelper1,AVCodecContext *codecContext,AVRational time_base);
+    VideoChannel(int id, JavaCallHelper *javaCallHelper1,AVCodecContext *codecContext,AVRational time_base,AVFormatContext* formatContext);
 
     /**
      * 播放音频或视频.
@@ -25,6 +25,7 @@ public:
      */
     virtual void stop();
 
+    virtual void seek(long ms);
     /**
      * 解码packet队列-》frame.
      */

@@ -39,7 +39,6 @@ void PoeFFmpeg::prepare() {
  */
 void PoeFFmpeg::prepareFFmpeg() {
 
-    av_register_all();
     //avformat 既可以解码本地文件 也可以解码直播文件，是一样的 .
     avformat_network_init();
     //总上下文，用来解压视频为 视频流+音频流.
@@ -117,7 +116,7 @@ void PoeFFmpeg::prepareFFmpeg() {
         //音频
         if(AVMEDIA_TYPE_AUDIO == codecParameters->codec_type){
             //音频
-            audioChannel = new AudioChannel(i,javaCallHelper ,codecContext,stream->time_base);
+            audioChannel = new AudioChannel(i,javaCallHelper ,codecContext,stream->time_base ,formatContext);
         } else if(AVMEDIA_TYPE_VIDEO == codecParameters->codec_type){
             //视频的帧率.
             AVRational av_frame_rate = stream->avg_frame_rate;
@@ -125,7 +124,7 @@ void PoeFFmpeg::prepareFFmpeg() {
             int fps = av_q2d(av_frame_rate);
 
             //视频
-            videoChannel = new VideoChannel(i, javaCallHelper,codecContext,stream->time_base);
+            videoChannel = new VideoChannel(i, javaCallHelper,codecContext,stream->time_base,formatContext);
             videoChannel->setReanderFrame(renderFrame);
             videoChannel->setFps(fps);
 
@@ -254,6 +253,16 @@ void PoeFFmpeg::close() {
     if(videoChannel){
         videoChannel->stop();
     }*/
+}
+
+//seek the frame to dest .
+void PoeFFmpeg::seek(long ms) {
+    //优先seek audio,如果没有audio则seek视频.
+    if(audioChannel){
+        audioChannel->seek(ms);
+    }else if(videoChannel){
+        videoChannel->seek(ms);
+    }
 }
 
 

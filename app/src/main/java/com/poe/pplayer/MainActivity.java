@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+                // TODO: 2020/4/22 结束seek后进行seek操作.
+                mPlayer.seek(25*1000);
             }
         });
 
@@ -81,14 +83,6 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissions(requestPermission,requestPermissionCode);
             }
         }
-
-        /*if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            AudioManager myAudioMgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            String nativeParam = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-            sampleRate = Integer.parseInt(nativeParam);
-            nativeParam = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-            bufSize = Integer.parseInt(nativeParam);
-        }*/
     }
 
 
@@ -105,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
             Log.e("poe","input 不存存在！");
         }
 
-//        mPlayer.setDataSource(input.getAbsolutePath());
-        mPlayer.setDataSource(mUrlEtv.getText().toString());
+        mPlayer.setDataSource(input.getAbsolutePath());
+//        mPlayer.setDataSource(mUrlEtv.getText().toString());
         mPlayer.setOnPrepareListener(new PoePlayer.OnPrepareListener() {
             @Override
             public void onPrepare() {
