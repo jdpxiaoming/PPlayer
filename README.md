@@ -1,10 +1,15 @@
-PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器(Player Base on FFmpeg ,support RTMP/RTSP/HLS/H265)
+PPlayer Base on FFmpeg ,support RTMP/RTSP/HLS/H265
 ===
->ffmpeg 4.0.2静态库从0开始一个播放器的搭建，支持rtmp、rtsp、hls、本地MP4文件播放，视频解码+音频解码+音视频同步
+
+###### 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器
+
+>FFmpeg 4.0.2静态库从0开始一个播放器的搭建，支持rtmp、rtsp、hls、本地MP4文件播放，视频解码+音频解码+音视频同步
 
 >在这里你可以看到全部的jni部分代码，不隐藏实现的c++代码，java调用c，然后c中回调java方法，在native层开启线程，同步锁pthred_mutex,pthread等等的使用。
 
 >你只需要有一点c的基础就可以动手开始改造本项目，查看本项目的每一次日志提交，清晰的脉络知识结构认知尽览无余。
+
+### FFmpeg4.0.2编译脚本及更多介绍参考[PPlayer-Wiki](https://github.com/jdpxiaoming/PPlayer/wiki/ffmpeg4.0.2%E7%BC%96%E8%AF%91)
 
 # 为什么选用静态库
 > 静态库是源代码的静态备份，jni编译时候会选择有用的头文件加载对应的源文件打包成so库，方便开发者写native层代码，用多少取多少（so体积不会固定死）是它的优势，
@@ -22,6 +27,7 @@ PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器(P
 - [x] 播放在线流媒体RTMP、RTSP、HLS
 - [x] 线程释放
 - [ ] `seek`进度条拖动(av_seek_frame)
+- [ ] 视频格式转码ex:flv->mp4.
 - [ ] `x264`推流`H264`
 - [ ] `faac`推流`AAC` 
  
@@ -40,7 +46,6 @@ PPlayer 基于Ffmpeg4.0.2(arm64-v8a)静态库搭建一套高可用的播放器(P
 ```
 mPlayer.setDataSource("rtmp://xxxxxxx.com/abcd12343");
 ```
-![pic](https://github.com/jdpxiaoming/PPlayer/blob/master/capture/hometiny.gif)
 
 # 测试流地址 
 1. 推荐[red5百度网盘](https://pan.baidu.com/s/1IEbbWcg5633GkL0V5MTupw) 提取码：`veyq`
