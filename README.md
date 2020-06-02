@@ -27,7 +27,7 @@ PPlayer Base on FFmpeg ,support RTMP/RTSP/HLS/H265
 - [x] 播放在线流媒体RTMP、RTSP、HLS
 - [x] 线程释放
 - [ ] `seek`进度条拖动(av_seek_frame)
-- [ ] 视频格式转码ex:flv->mp4.
+- [x] 视频格式转码ex:flv->mp4. see [FFmpegTools](https://github.com/jdpxiaoming/FFmpegTools)
 - [ ] `x264`推流`H264`
 - [ ] `faac`推流`AAC` 
  

@@ -46,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
         Button play = findViewById(R.id.btn_play);
         mSeekBar = findViewById(R.id.seek_bar);
         mUrlEtv = findViewById(R.id.edt_url);
+
+//        mUrl = "http://ovopark-record.oss-cn-shanghai.aliyuncs.com/039570f6-e4c3-4a1b-9886-5ad7e6d7181f.mp4";
+        mUrl = "http://118.31.174.18:5581/rtmp/8e5196c4-e7d9-41b0-9080-fa0da638d9e2/live.flv";
         mUrlEtv.setText(mUrl);
         //监听进度变化.
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -99,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
             Log.e("poe","input 不存存在！");
         }
 
-        mPlayer.setDataSource(input.getAbsolutePath());
-//        mPlayer.setDataSource(mUrlEtv.getText().toString());
+//        mPlayer.setDataSource(input.getAbsolutePath());
+        mPlayer.setDataSource(mUrlEtv.getText().toString());
         mPlayer.setOnPrepareListener(new PoePlayer.OnPrepareListener() {
             @Override
             public void onPrepare() {
