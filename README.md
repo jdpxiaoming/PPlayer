@@ -28,8 +28,8 @@ PPlayer Base on FFmpeg ,support RTMP/RTSP/HLS/H265
 - [x] 线程释放
 - [ ] `seek`进度条拖动(av_seek_frame)
 - [x] 视频格式转码ex:flv->mp4. see [FFmpegTools](https://github.com/jdpxiaoming/FFmpegTools)
-- [ ] `x264`推流`H264`
-- [ ] `faac`推流`AAC` 
+- [x] `x264`推流`H264`  see [PPush](https://github.com/jdpxiaoming/PPush)
+- [x] `faac`推流`AAC`   see [PPush](https://github.com/jdpxiaoming/PPush)
  
 
 # 运行demo
