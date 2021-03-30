@@ -9,7 +9,7 @@ PPlayer Base on FFmpeg ,support RTMP/RTSP/HLS/H265
 
 >你只需要有一点c的基础就可以动手开始改造本项目，查看本项目的每一次日志提交，清晰的脉络知识结构认知尽览无余。
 
-### FFmpeg4.0.2编译脚本及更多介绍参考[PPlayer-Wiki](https://github.com/jdpxiaoming/PPlayer/wiki/ffmpeg4.0.2%E7%BC%96%E8%AF%91)
+### FFmpeg4.0.2编译脚本及更多介绍参考[PPlayer-Wiki](https://github.com/jdpxiaoming/PPlayer/wiki/ffmpeg4.0.2%E7%BC%96%E8%AF%91)<!-- @IGNORE PREVIOUS: link -->
 
 # 为什么选用静态库
 > 静态库是源代码的静态备份，jni编译时候会选择有用的头文件加载对应的源文件打包成so库，方便开发者写native层代码，用多少取多少（so体积不会固定死）是它的优势，

@@ -49,10 +49,15 @@ void* audioDecode(void* args){
 
 void AudioChannel::play() {
 //    初始化转换器上下文,设置重采样 .
-    swrContext = swr_alloc_set_opts(0,AV_CH_LAYOUT_STEREO,AV_SAMPLE_FMT_S16,out_sample_rate,
+    swrContext = swr_alloc_set_opts(0,
+                        AV_CH_LAYOUT_STEREO,
+                        AV_SAMPLE_FMT_S16,
+                        out_sample_rate,
                         avCodecContext->channel_layout,
                         avCodecContext->sample_fmt,
-                        avCodecContext->sample_rate,0,0);
+                        avCodecContext->sample_rate,
+                        0,
+                        0);
     //初始化转换器的其他参数.
     swr_init(swrContext);
     pkt_queue.setWork(1);
@@ -205,7 +210,7 @@ void AudioChannel::decoder() {
         //音频的pakcket.
         LOGE("AudioChannel::decoder() #dequeue start !");
          int ret = pkt_queue.deQueue(packet);
-        LOGE("AudioChannel::decoder() #dequeue success# !%s",packet);
+        LOGE("AudioChannel::decoder() #dequeue success# !pkt_queue.size %d",pkt_queue.size());
          if(!isPlaying){
              break;
          }
@@ -242,7 +247,7 @@ void AudioChannel::decoder() {
         }
         //packet -》fram.
         frame_queue.enQueue(avFrame);
-        LOGE("frame_queue enQueue success ! :%d",frame_queue.size());
+        LOGE("audio frame_queue enQueue success ! :%d",frame_queue.size());
         while (frame_queue.size() > 100 && isPlaying){
             LOGE("frame_queue %d is full, sleep 16 ms",frame_queue.size());
             av_usleep(16*1000);
@@ -288,7 +293,8 @@ int AudioChannel::getPcm() {
 
         //计算当前音频的播放时钟clock. pts相对数量 time_base:时间单位（1,25）表示1/25分之一秒.
         clock = frame->pts*av_q2d(time_base);
-
+        LOGW("audio clock pts is %d",frame->pts);
+        LOGE("audio clock is %f",clock);
         break;
     }
 

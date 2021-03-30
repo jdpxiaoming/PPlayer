@@ -30,9 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar mSeekBar;
     private int mPorgress;
     private EditText mUrlEtv;
-
     private PoePlayer mPlayer;
-    private String mUrl = "rtmp://192.168.1.3:1935/oflaDemo/BladeRunner2049.flv";
+    private String mUrl;//播放地址.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +46,9 @@ public class MainActivity extends AppCompatActivity {
         mSeekBar = findViewById(R.id.seek_bar);
         mUrlEtv = findViewById(R.id.edt_url);
 
-//        mUrl = "http://ovopark-record.oss-cn-shanghai.aliyuncs.com/039570f6-e4c3-4a1b-9886-5ad7e6d7181f.mp4";
-        mUrl = "http://118.31.174.18:5581/rtmp/8e5196c4-e7d9-41b0-9080-fa0da638d9e2/live.flv";
+        mUrl="rtsp://106.75.254.198:5555/rtsp/c20ddaff-b2e5-4c10-80b7-938891409d35";//O3P
+//        mUrl="http://106.75.254.198:5581/rtsp/68448ebb-d34b-4af7-9cf9-ffe650ced784.flv";//O3P
+        mUrl = "http://106.75.254.198:5581/rtsp/4127aeff-4d1e-411b-9d21-23205f117e75.flv";//4x倍速播放.
         mUrlEtv.setText(mUrl);
         //监听进度变化.
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -60,21 +60,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
-            }
+    }
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-                // TODO: 2020/4/22 结束seek后进行seek操作.
-                mPlayer.seek(25*1000);
-            }
-        });
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        //DO: 2020/4/22 结束seek后进行seek操作.
+        mPlayer.seek(25*1000);
+    }
+});
 
         play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playLocal();
-            }
+@Override
+public void onClick(View v) {
+        playLocal();
+        }
         });
 
         mPlayer = new PoePlayer();
@@ -94,14 +93,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void playLocal() {
 //        File input = new File(Environment.getExternalStorageDirectory(),"/poe/input.mp4");
-        File input = new File(getCacheDir(),"/input.mp4");
-        Log.i("poe","input file: "+input.getAbsolutePath());
-        if(input.exists()){
-            Log.i("poe","input 存在！");
-        }else{
-            Log.e("poe","input 不存存在！");
-        }
-
+//        File input = new File(getCacheDir(),"/input.mp4");
+//        Log.i("poe","input file: "+input.getAbsolutePath());
+//        if(input.exists()){
+//            Log.i("poe","input 存在！");
+//        }else{
+//            Log.e("poe","input 不存存在！");
+//        }
 //        mPlayer.setDataSource(input.getAbsolutePath());
         mPlayer.setDataSource(mUrlEtv.getText().toString());
         mPlayer.setOnPrepareListener(new PoePlayer.OnPrepareListener() {

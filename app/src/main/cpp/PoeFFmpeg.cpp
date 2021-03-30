@@ -40,19 +40,27 @@ void PoeFFmpeg::prepare() {
 void PoeFFmpeg::prepareFFmpeg() {
 
     //avformat 既可以解码本地文件 也可以解码直播文件，是一样的 .
-    avformat_network_init();
+    int ret = avformat_network_init();
+    if(ret <0 ){
+        LOGE("Couldn’t init network %d",  ret);
+    }
     //总上下文，用来解压视频为 视频流+音频流.
     formatContext = avformat_alloc_context();
 
     //参数配置
     AVDictionary* opts = NULL;
     //设置超时时间3s（3000ms->3000000mms)
-    av_dict_set(&opts , "timeout" , "3000000",0);
+    av_dict_set(&opts, "rtsp_transport", "tcp", 0); //以udp方式打开，如果以tcp方式打开将udp替换为tcp
+//    av_dict_set(&opts , "timeout" , "3000000",0);
+//    av_dict_set(&opts, "buffer_size", "1024000", 0);
+//    av_dict_set(&opts, "max_delay", "500000", 0);
+//    av_dict_set(&opts, "stimeout", "20000000", 0);  //设置超时断开连接时间
     char buf[1024];
     //开始打开视频文件 .
-    int ret = avformat_open_input(&formatContext , url , NULL, NULL);
+    ret = avformat_open_input(&formatContext , url , NULL, &opts);
     av_strerror(ret, buf, 1024);
-    if(ret != 0 ){
+
+    if(ret < 0 ){
         LOGD("* * * * * * video open failure! * * * * * * * * *n %d",ret);
         LOGE("Couldn’t open file %s: %d(%s)", url, ret, buf);
         //播放失败，通知java层播放失败了.
@@ -115,12 +123,14 @@ void PoeFFmpeg::prepareFFmpeg() {
 
         //音频
         if(AVMEDIA_TYPE_AUDIO == codecParameters->codec_type){
+
             //音频
             audioChannel = new AudioChannel(i,javaCallHelper ,codecContext,stream->time_base ,formatContext);
+            LOGE("* * * * * * Audio stream timebase is! * * * * * * * * * %d/%d",stream->time_base.num,stream->time_base.den);
         } else if(AVMEDIA_TYPE_VIDEO == codecParameters->codec_type){
             //视频的帧率.
             AVRational av_frame_rate = stream->avg_frame_rate;
-
+            LOGE("* * * * * * Video stream timebase is! * * * * * * * * * %d/%d",stream->time_base.num,stream->time_base.den);
             int fps = av_q2d(av_frame_rate);
 
             //视频
