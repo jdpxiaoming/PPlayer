@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "com.poe.pplayer"
-        minSdkVersion 19
-        targetSdkVersion 28
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -16,8 +16,12 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
-                abiFilters "arm64-v8a"
+                abiFilters /*"arm64-v8a",*/"armeabi-v7a"
             }
+        }
+
+        ndk{
+            abiFilters "armeabi-v7a"
         }
     }
 
